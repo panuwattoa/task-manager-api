@@ -23,24 +23,22 @@ func GetEnv(key, fallback string) string {
 }
 
 type Config struct {
-	Server  Server
-	MongoDB MongoDB
+	Server  Server  `yaml:"server" json:"server"`
+	MongoDB MongoDB `yaml:"mongo_db" json:"mongo_db"`
 }
 
 type Server struct {
-	AppName         string
-	Env             string
-	Port            int
-	ReadTimeout     time.Duration
-	WriteTimeout    time.Duration
-	ShutdownTimeout time.Duration
+	Port            string        `yaml:"port" json:"port"`
+	ReadTimeout     time.Duration `yaml:"read_timeout" json:"read_timeout"`
+	WriteTimeout    time.Duration `yaml:"write_timeout" json:"write_timeout"`
+	ShutdownTimeout time.Duration `yaml:"shutdown_timeout" json:"shutdown_timeout"`
 }
 
 type MongoDB struct {
 	Collections struct {
-		Tasks string
-	}
-	Timeout               time.Duration
-	DefaultContextTimeout time.Duration
-	AppName               string
+		Tasks string `yaml:"tasks" json:"tasks"`
+	} `yaml:"collection" json:"collection"`
+	Timeout               time.Duration `yaml:"timeout" json:"timeout"`
+	DefaultContextTimeout time.Duration `yaml:"default_context_timeout" json:"default_context_timeout"`
+	AppName               string        `yaml:"app_name" json:"app_name"`
 }

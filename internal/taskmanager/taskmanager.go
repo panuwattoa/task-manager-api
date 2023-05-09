@@ -14,3 +14,15 @@ type IMongo interface {
 	FindOne(ctx context.Context, filter interface{}, opts ...*options.FindOneOptions) iMongo.SingleResult
 	UpdateOne(ctx context.Context, filter interface{}, update interface{}, opts ...*options.UpdateOptions) (*mongo.UpdateResult, error)
 }
+
+type TaskManager struct {
+	mongo IMongo
+}
+
+func NewTaskManager(mongo IMongo) *TaskManager {
+	return &TaskManager{mongo: mongo}
+}
+
+func (t *TaskManager) CreateTask(ctx context.Context) error {
+	return nil
+}
