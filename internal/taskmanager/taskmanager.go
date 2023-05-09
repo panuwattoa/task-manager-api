@@ -23,6 +23,29 @@ func NewTaskManager(mongo IMongo) *TaskManager {
 	return &TaskManager{mongo: mongo}
 }
 
-func (t *TaskManager) CreateTask(ctx context.Context) error {
+type TaskDoc struct {
+	ID          string `bson:"_id"`
+	Topic       string `bson:"topic"`
+	Description string `bson:"description"`
+	Status      int    `bson:"status"`
+	CreateDate  int64  `bson:"create_date"`
+	OwnerID     string `bson:"owner_id"`
+	ArchiveDate int64  `bson:"archive_date"`
+	UpdateDate  int64  `bson:"update_date"`
+}
+
+func (t *TaskManager) CreateTask(ctx context.Context, topic string, desc string) error {
+	return nil
+}
+
+func (t *TaskManager) GetTask(ctx context.Context, id string) (*TaskDoc, error) {
+	return nil, nil
+}
+
+func (t *TaskManager) UpdateTaskStatus(ctx context.Context, id string, status int) error {
+	return nil
+}
+
+func (t *TaskManager) ArchiveTask(ctx context.Context, id string) error {
 	return nil
 }
