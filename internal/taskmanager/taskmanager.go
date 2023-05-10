@@ -30,8 +30,8 @@ type TaskDoc struct {
 	Status      int    `bson:"status"`
 	CreateDate  int64  `bson:"create_date"`
 	OwnerID     string `bson:"owner_id"`
-	ArchiveDate int64  `bson:"archive_date"`
-	UpdateDate  int64  `bson:"update_date"`
+	ArchiveDate *int64 `bson:"archive_date"`
+	UpdateDate  *int64 `bson:"update_date"`
 }
 
 func (t *TaskManager) CreateTask(ctx context.Context, topic string, desc string) error {

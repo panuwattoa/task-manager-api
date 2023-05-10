@@ -9,10 +9,10 @@ var Conf = new(Config)
 
 var (
 	ServerType    = GetEnv("SERVER_TYPE", "Development")
-	MongoHost     = GetEnv("MONGO_HOST", "127.0.0.1")
-	MongoDBName   = GetEnv("MONGO_DBNAME", "")
-	MongoUser     = GetEnv("MONGO_USERNAME", "")
-	MongoPassword = GetEnv("MONGO_PASSWORD", "")
+	MongoHost     = GetEnv("MONGO_HOST", "mongodb://127.0.0.1:27017")
+	MongoDBName   = GetEnv("MONGO_DBNAME", "taskManager")
+	MongoUser     = GetEnv("MONGO_USERNAME", "managerapp")
+	MongoPassword = GetEnv("MONGO_PASSWORD", "1111")
 )
 
 func GetEnv(key, fallback string) string {
@@ -23,22 +23,22 @@ func GetEnv(key, fallback string) string {
 }
 
 type Config struct {
-	Server  Server  `yaml:"server" json:"server"`
-	MongoDB MongoDB `yaml:"mongo_db" json:"mongo_db"`
+	Server  Server
+	MongoDB MongoDB
 }
 
 type Server struct {
-	Port            string        `yaml:"port" json:"port"`
-	ReadTimeout     time.Duration `yaml:"read_timeout" json:"read_timeout"`
-	WriteTimeout    time.Duration `yaml:"write_timeout" json:"write_timeout"`
-	ShutdownTimeout time.Duration `yaml:"shutdown_timeout" json:"shutdown_timeout"`
+	Port            string
+	ReadTimeout     time.Duration
+	WriteTimeout    time.Duration
+	ShutdownTimeout time.Duration
 }
 
 type MongoDB struct {
 	Collections struct {
-		Tasks string `yaml:"tasks" json:"tasks"`
-	} `yaml:"collection" json:"collection"`
-	Timeout               time.Duration `yaml:"timeout" json:"timeout"`
-	DefaultContextTimeout time.Duration `yaml:"default_context_timeout" json:"default_context_timeout"`
-	AppName               string        `yaml:"app_name" json:"app_name"`
+		Tasks string
+	}
+	Timeout               time.Duration
+	DefaultContextTimeout time.Duration
+	AppName               string
 }

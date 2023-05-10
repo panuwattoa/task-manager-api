@@ -15,23 +15,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func init() {
-	// reading environment configuration into struct
-	err := config.LoadEnv()
-	if err != nil {
-		println(err.Error())
-		os.Exit(-1)
-	}
-
-	// reading file configuration configuration into struct
-	err = config.LoadFile()
-	if err != nil {
-		println(err.Error())
-		os.Exit(-1)
-	}
-}
-
 func main() {
+	readConfiguration()
 	// Mongo
 	mongoDB := mongo.NewMongoDB()
 
@@ -86,4 +71,12 @@ func errorInterceptor(ctx *fiber.Ctx, err error) error {
 	}
 	ctx.Set("Content-Type", "application/json")
 	return ctx.Status(code).JSON(msg)
+}
+
+func readConfiguration() {
+	if err := config.Read(config.Conf); err != nil {
+		os.Exit(78) // 78 - Configuration error
+	}
+
+	return
 }

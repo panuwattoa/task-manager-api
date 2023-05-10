@@ -1,0 +1,12 @@
+config: &default
+  server:
+    port: 3000
+    readTimeout: 60
+    writeTimeout: 60
+    shutdownTimeout: 30
+  mongoDB:
+    collection:
+      tasks: tasks
+    timeout: 60 #second
+    defaultContextTimeout: 60 #second
+    appName: test

@@ -2,64 +2,36 @@ package config
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 
-	"github.com/caarlos0/env/v6"
-	"gopkg.in/yaml.v3"
+	"github.com/spf13/viper"
 )
 
-const (
-	configFileName = "config.yaml"
-)
-
-var (
-	Env = environmentConfig{}
-)
-
-// Env data structure
-type environmentConfig struct {
-	AppEnv string `env:"APP_ENV,required"`
-}
-
-// LoadEnv gets configuration from environment then parse to Env variable
-func LoadEnv() error {
-	function := "LoadEnv"
-
-	err := env.Parse(&Env)
-	if err != nil {
-		return fmt.Errorf("%s: unable to read environment configuration, %s", function, err.Error())
+// Read reads configuration data and unmarshall to models.Config
+func Read(config interface{}) error {
+	currentDir, _ := os.Getwd()
+	rViper := viper.New()
+	rViper.AddConfigPath(currentDir)             //default older structure
+	rViper.AddConfigPath(currentDir + "/../../") //default new structure
+	rViper.SetConfigName("config")
+	rViper.SetConfigType("yml")
+	if err := rViper.ReadInConfig(); err != nil {
+		fmt.Printf("cannot read configuration config.yml : %v\n", err)
+		return err
 	}
 
-	return nil
-}
-
-// LoadFile gets configuration from file then parse to App variable
-func LoadFile() error {
-	function := "LoadFile"
-
-	// read configuration file
-	data, err := ioutil.ReadFile(configFileName)
+	//override
+	rViper.SetConfigFile(currentDir + "/config/config.yml")
+	err := rViper.MergeInConfig()
 	if err != nil {
-		return fmt.Errorf("%s: unable to read file configuration, %s", function, err.Error())
+		rViper.SetConfigFile(currentDir + "/../../config/config.yml")
+		rViper.MergeInConfig()
 	}
 
-	// unmarshal configuration data to map[string]interface{}
-	var dataMap map[string]interface{}
-	err = yaml.Unmarshal(data, &dataMap)
-	if err != nil {
-		return fmt.Errorf("%s: unable to unmarshal configuration data to map, %s", function, err.Error())
-	}
-
-	// get configuration by environment(local, dev, or etc.) and marshal to binary
-	envData, err := yaml.Marshal(dataMap[Env.AppEnv])
-	if err != nil {
-		return fmt.Errorf("%s: unable to marshal configuration data, %s", function, err.Error())
-	}
-
-	// unmarshal configuration data to App variable
-	err = yaml.Unmarshal(envData, &Conf)
-	if err != nil {
-		return fmt.Errorf("%s: unable to unmarshal configuration data to App, %s", function, err.Error())
+	// prevention hidden issue when unmarshal fail
+	if err := rViper.Unmarshal(config); err != nil {
+		fmt.Printf("cannot unmarshal configuration, %v\n", err)
+		return err
 	}
 
 	return nil
