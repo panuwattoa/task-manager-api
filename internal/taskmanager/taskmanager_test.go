@@ -216,3 +216,36 @@ func (t *TaskManagerTestSuite) TestArchiveTask() {
 		t.NoError(err)
 	})
 }
+
+func (t *TaskManagerTestSuite) TestUpdateTaskStatus() {
+	t.Run("update task status but update one got error should return error", func() {
+		objectId, _ := primitive.ObjectIDFromHex("6041c3a6cfcba2fb9c4a4fd2")
+		t.mockMongo.EXPECT().UpdateOne(context.Background(), bson.M{
+			"_id": objectId,
+		}, bson.M{
+			"$set": bson.M{
+				"Status":     1,
+				"UpdateDate": t.service.now().Unix(),
+			},
+		}).Return(nil, errors.New("update one error"))
+		err := t.service.UpdateTaskStatus(context.Background(), "6041c3a6cfcba2fb9c4a4fd2", 1)
+		t.Error(err)
+		t.EqualError(err, "update one error")
+	})
+
+	t.Run("update task status success", func() {
+		objectId, _ := primitive.ObjectIDFromHex("6041c3a6cfcba2fb9c4a4fd2")
+		t.mockMongo.EXPECT().UpdateOne(context.Background(), bson.M{
+			"_id": objectId,
+		}, bson.M{
+			"$set": bson.M{
+				"Status":     2,
+				"UpdateDate": t.service.now().Unix(),
+			},
+		}).Return(&mongo.UpdateResult{
+			MatchedCount: 1,
+		}, nil)
+		err := t.service.UpdateTaskStatus(context.Background(), "6041c3a6cfcba2fb9c4a4fd2", 2)
+		t.NoError(err)
+	})
+}
