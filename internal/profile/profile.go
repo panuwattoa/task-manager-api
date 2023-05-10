@@ -3,6 +3,7 @@ package profile
 import (
 	"context"
 	iMongo "task-manager-api/internal/mongo"
+	"time"
 
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -13,7 +14,6 @@ type IMongo interface {
 }
 
 type ProfileDoc struct {
-	ID          string `json:"id" bson:"_id"`
 	OwnerID     string `json:"owner_id" bson:"owner_id"`
 	DisplayName string `json:"display_name" bson:"display_name"`
 	Email       string `json:"email" bson:"email"`
@@ -23,12 +23,21 @@ type ProfileDoc struct {
 
 type Profile struct {
 	mongo IMongo
+	time  func() time.Time
 }
 
 func NewProfileService(mongo IMongo) *Profile {
 	return &Profile{mongo: mongo}
 }
 
-func (p *Profile) GetProfile(ctx context.Context, id string) (*ProfileDoc, error) {
+func (p *Profile) GetProfile(ctx context.Context, ownerId string) (*ProfileDoc, error) {
 	return nil, nil
+}
+
+func (p *Profile) now() time.Time {
+	if p.time == nil {
+		return time.Now()
+	}
+
+	return p.time()
 }
