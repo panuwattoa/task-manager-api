@@ -26,7 +26,8 @@ type Config struct {
 	Server     Server
 	MongoDB    MongoDB
 	Pagination struct {
-		MaxLimit int
+		MaxLimit           int
+		MaxGetProfileLimit int
 	}
 }
 
@@ -39,7 +40,9 @@ type Server struct {
 
 type MongoDB struct {
 	Collections struct {
-		Tasks string
+		Tasks    string
+		Profiles string
+		Comments string
 	}
 	Timeout               time.Duration
 	DefaultContextTimeout time.Duration

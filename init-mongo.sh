@@ -21,6 +21,7 @@ mongosh -- "$MONGO_INITDB_DATABASE" <<EOF
         "owner_id": "1234",
         "email": "panuwat_jarujareet@hotmail.com",
         "display_name": "Panuwat Jarujareet",
+        "display_pic": "https://picsum.photos/id/237/200/300",
         "update_date": 1620000000,
         "create_date": 1620000000
     },
@@ -28,6 +29,7 @@ mongosh -- "$MONGO_INITDB_DATABASE" <<EOF
         "owner_id": "5678",
         "email": "kondee_na@gmail.com",
         "display_name": "Kondee Na",
+        "display_pic": "https://picsum.photos/seed/picsum/200/300",
         "update_date": 1620000000,
         "create_date": 1620000000
     }]);
@@ -98,20 +100,20 @@ mongosh -- "$MONGO_INITDB_DATABASE" <<EOF
 
       db.comments.insertMany([
         {
-            "topic_id": "645b9183fcfbc11433e23ab3",
+            "task_id": "645b9183fcfbc11433e23ab3",
             "owner_id": "1234",
             "content": "I agree with you",
             "create_date": 1683722889,
             "update_date": 1683722889
         },
         {
-            "topic_id": "645b9183fcfbc11433e23ab3",
+            "task_id": "645b9183fcfbc11433e23ab3",
             "owner_id": "5678",
             "content": "I agree with you too",
             "create_date": 1683722889,
             "update_date": 1683722889
         }
         ]);
-        db.comments.createIndex({ "topic_id": 1 });
+        db.comments.createIndex({ "task_id": 1 });
 
 EOF

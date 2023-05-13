@@ -58,7 +58,7 @@ func (t *CommentTestSuite) TestGetTopicComments() {
 
 	t.Run("get topic comments but find has error should return error", func() {
 		t.mockMongo.EXPECT().Find(context.Background(), bson.M{
-			"topic_id": "topic_id",
+			"task_id": "topic_id",
 		}, fOpt).Return(nil, errors.New("find error"))
 		comments, err := t.service.GetTopicComments(context.Background(), "topic_id", 1, 10)
 		t.Error(err)
@@ -67,7 +67,7 @@ func (t *CommentTestSuite) TestGetTopicComments() {
 	})
 	t.Run("get topic comments but decode has error should return error", func() {
 		t.mockMongo.EXPECT().Find(context.Background(), bson.M{
-			"topic_id": "topic_id",
+			"task_id": "topic_id",
 		}, fOpt).Return(t.cursor, nil)
 		t.cursor.EXPECT().All(context.Background(), gomock.Any()).DoAndReturn(func(ctx context.Context, result interface{}) error {
 			return errors.New("cursor decode error")
@@ -80,13 +80,13 @@ func (t *CommentTestSuite) TestGetTopicComments() {
 
 	t.Run("get topic comments should return comments", func() {
 		t.mockMongo.EXPECT().Find(context.Background(), bson.M{
-			"topic_id": "topic_id",
+			"task_id": "topic_id",
 		}, fOpt).Return(t.cursor, nil)
 		var comments = make([]CommentDoc, 0)
 		t.cursor.EXPECT().All(context.Background(), &comments).DoAndReturn(func(ctx context.Context, result interface{}) error {
 			comments = append(comments, CommentDoc{
 				ID:         "comment_id",
-				TopicId:    "topic_id",
+				TaskId:     "topic_id",
 				Content:    "content",
 				CreateDate: 1569151351,
 				OwnerId:    "owner_id",
@@ -99,7 +99,7 @@ func (t *CommentTestSuite) TestGetTopicComments() {
 		t.NotNil(comments)
 		t.Equal(1, len(comments))
 		t.Equal("comment_id", comments[0].ID)
-		t.Equal("topic_id", comments[0].TopicId)
+		t.Equal("topic_id", comments[0].TaskId)
 		t.Equal("content", comments[0].Content)
 		t.Equal(int64(1569151351), comments[0].CreateDate)
 		t.Equal("owner_id", comments[0].OwnerId)
@@ -109,7 +109,7 @@ func (t *CommentTestSuite) TestGetTopicComments() {
 func (t *CommentTestSuite) TestCreateComment() {
 	t.Run("create comment but insert has error should return error", func() {
 		t.mockMongo.EXPECT().InsertOne(context.Background(), CommentDoc{
-			TopicId:    "topic_id",
+			TaskId:     "topic_id",
 			Content:    "content",
 			OwnerId:    "owner_id",
 			CreateDate: int64(1569130951),
@@ -122,7 +122,7 @@ func (t *CommentTestSuite) TestCreateComment() {
 
 	t.Run("create comment but can not convert _id", func() {
 		t.mockMongo.EXPECT().InsertOne(context.Background(), CommentDoc{
-			TopicId:    "topic_id",
+			TaskId:     "topic_id",
 			Content:    "content",
 			OwnerId:    "owner_id",
 			CreateDate: int64(1569130951),
@@ -138,7 +138,7 @@ func (t *CommentTestSuite) TestCreateComment() {
 	t.Run("create comment should return comment", func() {
 		objId, _ := primitive.ObjectIDFromHex("5ad9a913478c26d220afb681")
 		t.mockMongo.EXPECT().InsertOne(context.Background(), CommentDoc{
-			TopicId:    "topic_id",
+			TaskId:     "topic_id",
 			Content:    "content",
 			OwnerId:    "owner_id",
 			CreateDate: int64(1569130951),
@@ -149,7 +149,7 @@ func (t *CommentTestSuite) TestCreateComment() {
 		t.NoError(err)
 		t.NotNil(comment)
 		t.Equal("5ad9a913478c26d220afb681", comment.ID)
-		t.Equal("topic_id", comment.TopicId)
+		t.Equal("topic_id", comment.TaskId)
 		t.Equal("content", comment.Content)
 		t.Equal(int64(1569130951), comment.CreateDate)
 		t.Equal("owner_id", comment.OwnerId)
