@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -18,31 +17,38 @@ import (
 )
 
 func main() {
-	readConfiguration()
-	// Mongo
-	mongoDB := mongo.NewMongoDB()
+	err := config.Read(config.Conf)
+	if err != nil {
+		log.Fatalf("failed to read configuration: %v", err)
+	}
 
+	// Initialize mongoDB
+	mongoDB := mongo.NewMongoDB()
+	defer mongoDB.Close(context.Background())
 	if err := mongoDB.Open(context.Background()); err != nil {
-		log.Fatal(err)
+		log.Fatalf("failed to connect to MongoDB: %v", err)
 	}
 	if err := mongoDB.Status(context.Background()); err != nil {
-		log.Fatal(err)
+		log.Fatalf("MongoDB health check failed: %v", err)
 	}
 
-	mongoTaskCollection := mongo.NewCollectionHelper(mongoDB.GetCollection(config.Conf.MongoDB.Collections.Tasks))
-	profileCollection := mongo.NewCollectionHelper(mongoDB.GetCollection(config.Conf.MongoDB.Collections.Profiles))
-	commentCollection := mongo.NewCollectionHelper(mongoDB.GetCollection(config.Conf.MongoDB.Collections.Comments))
+	// Initialize collections
+	mongoTaskCollection := mongoDB.GetCollection(config.Conf.MongoDB.Collections.Tasks)
+	profileCollection := mongoDB.GetCollection(config.Conf.MongoDB.Collections.Profiles)
+	commentCollection := mongoDB.GetCollection(config.Conf.MongoDB.Collections.Comments)
 
-	taskService := taskmanager.NewTaskManager(mongoTaskCollection)
-	pfService := profile.NewProfileService(profileCollection)
-	commentService := comment.NewCommentService(commentCollection)
+	// Initialize services and handlers
+	taskService := taskmanager.NewTaskManager(mongo.NewCollectionHelper(mongoTaskCollection))
+	pfService := profile.NewProfileService(mongo.NewCollectionHelper(profileCollection))
+	commentService := comment.NewCommentService(mongo.NewCollectionHelper(commentCollection))
 	handler := handler.NewHandler(taskService, commentService, pfService)
 
+	// Initialize Fiber app
 	app := fiber.New(fiber.Config{
-		// Override default error handler
-		ErrorHandler: errorInterceptor,
+		ErrorHandler: errorHandler,
 	})
 
+	// Define routes
 	app.Get("/tasks", handler.GetAllTask)
 	app.Get("/tasks/:taskId", handler.GetTask)
 	app.Get("/profiles/:ownerId", handler.GetProfile)
@@ -50,62 +56,54 @@ func main() {
 	app.Get("/tasks/:taskId/comments", handler.GetTopicComments)
 
 	customerGroup := app.Group("/account")
-	customerGroup.Use(
-		func(c *fiber.Ctx) error {
-			return authInterceptor(c)
-		},
-	)
+	customerGroup.Use(authInterceptor)
 	customerGroup.Post(":ownerId/tasks", handler.CreateTask)
 	customerGroup.Post(":ownerId/tasks/:taskId/comments", handler.CreateComment)
 	customerGroup.Patch(":ownerId/tasks/:taskId", handler.UpdateTask)
 	customerGroup.Patch(":ownerId/tasks/:taskId/archive", handler.ArchiveTask)
 
+	// Start HTTP server
 	go func() {
 		if err := app.Listen(":" + config.Conf.Server.Port); err != nil {
-			fmt.Print("can not start http server")
-			log.Fatal(err)
+			log.Fatalf("failed to start HTTP server: %v", err)
 		}
 	}()
-	// make SIGINT send context cancel for graceful stop
-	gfs := make(chan os.Signal, 1)
-	signal.Notify(gfs, syscall.SIGTERM, syscall.SIGINT)
-	<-gfs
 
-	_ = app.Shutdown()
-	// stop mongo db
-	err := mongoDB.Close(context.Background())
-	if err != nil {
-		log.Fatal(err)
-	}
+	// Wait for SIGTERM or SIGINT signal
+	gracefully(app, mongoDB)
 }
 
 func authInterceptor(ctx *fiber.Ctx) error {
 	// TODO: validate Authorization header
-
 	return ctx.Next()
 }
 
-func errorInterceptor(ctx *fiber.Ctx, err error) error {
-	// Override default error handler
-	// Status code defaults to 500
+func errorHandler(ctx *fiber.Ctx, err error) error {
 	code := fiber.StatusInternalServerError
-	// Retrieve the custom status code if it's an fiber.*Error
 	if e, ok := err.(*fiber.Error); ok {
 		code = e.Code
 	}
-	fmt.Printf("Error: %v\n", err)
+	log.Printf("error: %v", err)
 	msg := map[string]interface{}{
 		"status":    code,
 		"error_msg": err.Error(),
 	}
-	ctx.Set("Content-Type", "application/json")
 	return ctx.Status(code).JSON(msg)
 }
 
-func readConfiguration() {
-	if err := config.Read(config.Conf); err != nil {
-		os.Exit(78) // 78 - Configuration error
+func gracefully(app *fiber.App, mongoDB *mongo.MongoDB) {
+	// Make SIGINT send context cancel for graceful stop
+	gfs := make(chan os.Signal, 1)
+	signal.Notify(gfs, syscall.SIGTERM, syscall.SIGINT)
+	<-gfs
+
+	// Shutdown server
+	if err := app.Shutdown(); err != nil {
+		log.Fatal(err)
 	}
 
-	return
+	// Stop mongo db
+	if err := mongoDB.Close(context.Background()); err != nil {
+		log.Fatal(err)
+	}
 }
