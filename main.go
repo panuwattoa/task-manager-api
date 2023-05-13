@@ -21,10 +21,10 @@ func main() {
 	mongoDB := mongo.NewMongoDB()
 
 	if err := mongoDB.Open(context.Background()); err != nil {
-		// TODO: log fatal error
+		log.Fatal(err)
 	}
 	if err := mongoDB.Status(context.Background()); err != nil {
-		// TODO: log fatal error
+		log.Fatal(err)
 	}
 
 	mongoTaskCollection := mongo.NewCollectionHelper(mongoDB.GetCollection(config.Conf.MongoDB.Collections.Tasks))
@@ -35,7 +35,8 @@ func main() {
 		ErrorHandler: errorInterceptor,
 	})
 
-	app.Post("/tasks", handler.CreateTask)
+	app.Post("account/:ownerId/tasks", handler.CreateTask)
+	app.Get("/tasks", handler.GetAllTask)
 
 	go func() {
 		if err := app.Listen(":" + config.Conf.Server.Port); err != nil {
@@ -52,7 +53,7 @@ func main() {
 	// stop mongo db
 	err := mongoDB.Close(context.Background())
 	if err != nil {
-		// TODO: log error
+		log.Fatal(err)
 	}
 }
 
