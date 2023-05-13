@@ -19,6 +19,8 @@ type response struct {
 }
 
 //go:generate mockgen -source=./handler.go -destination=./mock/handler_mock.go
+// https://github.com/golang/go/wiki/CodeReviewComments#interfaces
+// https://go.dev/doc/effective_go.html#interfaces_and_types
 type ITasks interface {
 	CreateTask(ctx context.Context, ownerId string, topic string, desc string) (*taskmanager.TaskDoc, error)
 	GetAllTask(ctx context.Context, page int, limit int) ([]taskmanager.TaskDoc, error)
