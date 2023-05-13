@@ -5,6 +5,8 @@ services:
     restart: always
     ports:
       - 27017:27017
+    networks:
+      - default
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=123456
@@ -18,13 +20,22 @@ services:
     image: task-manager-api
     build: .
     container_name: task-manager-api
-    network_mode: host
+    ports:
+      - 3000:3000
+    networks:
+      - default
+    depends_on:
+      - database
     volumes:
       - /etc/localtime:/etc/localtime:ro
     environment:
       - SERVER_TYPE=Production
-      - MONGO_HOST=mongodb://127.0.0.1:27017
+      - MONGO_HOST=mongodb://database:27017
       - MONGO_DBNAME=taskManager
       - MONGO_USERNAME=managerapp
       - MONGO_PASSWORD=1111
     restart: always
+
+networks:
+  default:
+    driver: bridge
