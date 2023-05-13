@@ -59,7 +59,7 @@ func (t *TaskManagerTestSuite) TestCreateTask() {
 			CreateDate:  t.service.now().Unix(),
 			OwnerID:     "owner_id",
 		}).Return(nil, errors.New("insert one error"))
-		taskDoc, err := t.service.CreateTask(context.Background(), "topic", "description", "owner_id")
+		taskDoc, err := t.service.CreateTask(context.Background(), "owner_id", "topic", "description")
 		t.Error(err)
 		t.Nil(taskDoc)
 		t.EqualError(err, "insert one error")
@@ -75,7 +75,7 @@ func (t *TaskManagerTestSuite) TestCreateTask() {
 		}).Return(&mongo.InsertOneResult{
 			InsertedID: "5ad9a913478c26d220afb681",
 		}, nil)
-		taskDoc, err := t.service.CreateTask(context.Background(), "topic", "description", "owner_id")
+		taskDoc, err := t.service.CreateTask(context.Background(), "owner_id", "topic", "description")
 		t.NotNil(err)
 		t.EqualError(err, "cannot convert inserted id to object id")
 		t.Nil(taskDoc)
@@ -92,7 +92,7 @@ func (t *TaskManagerTestSuite) TestCreateTask() {
 		}).Return(&mongo.InsertOneResult{
 			InsertedID: objId,
 		}, nil)
-		taskDoc, err := t.service.CreateTask(context.Background(), "topic", "description", "owner_id")
+		taskDoc, err := t.service.CreateTask(context.Background(), "owner_id", "topic", "description")
 		t.Nil(err)
 		t.NotNil(taskDoc)
 		t.Equal("5ad9a913478c26d220afb681", taskDoc.ID)
@@ -120,6 +120,10 @@ func (t *TaskManagerTestSuite) TestGetTask() {
 					"archive_date": nil,
 				},
 			},
+		}, &options.FindOneOptions{
+			Sort: bson.M{
+				"_id": 1,
+			},
 		}).Return(t.singleResult)
 		t.singleResult.EXPECT().Decode(&TaskDoc{}).Return(errors.New("something wrong")).Times(1)
 		taskDoc, err := t.service.GetTask(context.Background(), "6041c3a6cfcba2fb9c4a4fd2")
@@ -141,6 +145,10 @@ func (t *TaskManagerTestSuite) TestGetTask() {
 				{
 					"archive_date": nil,
 				},
+			},
+		}, &options.FindOneOptions{
+			Sort: bson.M{
+				"_id": 1,
 			},
 		}).Return(t.singleResult)
 		t.singleResult.EXPECT().Decode(&TaskDoc{}).Return(mongo.ErrNoDocuments).Times(1)
@@ -164,6 +172,10 @@ func (t *TaskManagerTestSuite) TestGetTask() {
 					"archive_date": nil,
 				},
 			},
+		}, &options.FindOneOptions{
+			Sort: bson.M{
+				"_id": 1,
+			},
 		}).Return(t.singleResult)
 		t.singleResult.EXPECT().Decode(&TaskDoc{}).Return(errors.New("decode error")).Times(1)
 		taskDoc, err := t.service.GetTask(context.Background(), "6041c3a6cfcba2fb9c4a4fd2")
@@ -186,6 +198,10 @@ func (t *TaskManagerTestSuite) TestGetTask() {
 				{
 					"archive_date": nil,
 				},
+			},
+		}, &options.FindOneOptions{
+			Sort: bson.M{
+				"_id": 1,
 			},
 		}).Return(t.singleResult)
 		t.singleResult.EXPECT().Decode(&TaskDoc{}).DoAndReturn(func(doc *TaskDoc) error {
@@ -211,22 +227,25 @@ func (t *TaskManagerTestSuite) TestArchiveTask() {
 	t.Run("archive task but update one got error should return error", func() {
 		objectId, _ := primitive.ObjectIDFromHex("6041c3a6cfcba2fb9c4a4fd2")
 		t.mockMongo.EXPECT().UpdateOne(context.Background(), bson.M{
-			"_id": objectId,
+			"_id":      objectId,
+			"owner_id": "owner_id",
 		}, bson.M{
 			"$set": bson.M{
 				"archive_date": t.service.now().Unix(),
 				"update_date":  t.service.now().Unix(),
 			},
 		}).Return(nil, errors.New("update one error"))
-		err := t.service.ArchiveTask(context.Background(), "6041c3a6cfcba2fb9c4a4fd2")
+		c, err := t.service.ArchiveTask(context.Background(), "owner_id", "6041c3a6cfcba2fb9c4a4fd2")
 		t.Error(err)
+		t.Equal(0, c)
 		t.EqualError(err, "update one error")
 	})
 
 	t.Run("archive task success", func() {
 		objectId, _ := primitive.ObjectIDFromHex("6041c3a6cfcba2fb9c4a4fd2")
 		t.mockMongo.EXPECT().UpdateOne(context.Background(), bson.M{
-			"_id": objectId,
+			"_id":      objectId,
+			"owner_id": "owner_id",
 		}, bson.M{
 			"$set": bson.M{
 				"archive_date": t.service.now().Unix(),
@@ -235,7 +254,8 @@ func (t *TaskManagerTestSuite) TestArchiveTask() {
 		}).Return(&mongo.UpdateResult{
 			MatchedCount: 1,
 		}, nil)
-		err := t.service.ArchiveTask(context.Background(), "6041c3a6cfcba2fb9c4a4fd2")
+		count, err := t.service.ArchiveTask(context.Background(), "owner_id", "6041c3a6cfcba2fb9c4a4fd2")
+		t.Equal(1, count)
 		t.NoError(err)
 	})
 }
@@ -244,14 +264,15 @@ func (t *TaskManagerTestSuite) TestUpdateTaskStatus() {
 	t.Run("update task status but update one got error should return error", func() {
 		objectId, _ := primitive.ObjectIDFromHex("6041c3a6cfcba2fb9c4a4fd2")
 		t.mockMongo.EXPECT().UpdateOne(context.Background(), bson.M{
-			"_id": objectId,
+			"_id":      objectId,
+			"owner_id": "owner_id",
 		}, bson.M{
 			"$set": bson.M{
 				"status":      1,
 				"update_date": t.service.now().Unix(),
 			},
 		}).Return(nil, errors.New("update one error"))
-		err := t.service.UpdateTaskStatus(context.Background(), "6041c3a6cfcba2fb9c4a4fd2", 1)
+		err := t.service.UpdateTaskStatus(context.Background(), "owner_id", "6041c3a6cfcba2fb9c4a4fd2", 1)
 		t.Error(err)
 		t.EqualError(err, "update one error")
 	})
@@ -259,7 +280,8 @@ func (t *TaskManagerTestSuite) TestUpdateTaskStatus() {
 	t.Run("update task status success", func() {
 		objectId, _ := primitive.ObjectIDFromHex("6041c3a6cfcba2fb9c4a4fd2")
 		t.mockMongo.EXPECT().UpdateOne(context.Background(), bson.M{
-			"_id": objectId,
+			"_id":      objectId,
+			"owner_id": "owner_id",
 		}, bson.M{
 			"$set": bson.M{
 				"status":      2,
@@ -268,7 +290,7 @@ func (t *TaskManagerTestSuite) TestUpdateTaskStatus() {
 		}).Return(&mongo.UpdateResult{
 			MatchedCount: 1,
 		}, nil)
-		err := t.service.UpdateTaskStatus(context.Background(), "6041c3a6cfcba2fb9c4a4fd2", 2)
+		err := t.service.UpdateTaskStatus(context.Background(), "owner_id", "6041c3a6cfcba2fb9c4a4fd2", 2)
 		t.NoError(err)
 	})
 }
