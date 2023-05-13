@@ -23,8 +23,11 @@ func GetEnv(key, fallback string) string {
 }
 
 type Config struct {
-	Server  Server
-	MongoDB MongoDB
+	Server     Server
+	MongoDB    MongoDB
+	Pagination struct {
+		MaxLimit int
+	}
 }
 
 type Server struct {
