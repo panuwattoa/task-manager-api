@@ -45,20 +45,11 @@ func TestProfileTestSuite(t *testing.T) {
 }
 
 func (t *ProfileTestSuite) TestGetProfile() {
-	t.Run("get profile but find one has error should return error", func() {
-		t.mockMongo.EXPECT().FindOne(context.Background(), bson.M{
-			"owner_id": "user_id",
-		}).Return(nil, nil, errors.New("find one error"))
-		profile, err := t.service.GetProfile(context.Background(), "user_id")
-		t.Error(err)
-		t.Nil(profile)
-		t.EqualError(err, "find one error")
-	})
 	t.Run("get profile but decode has error should return error", func() {
 		t.singleResult.EXPECT().Decode(gomock.Any()).Return(errors.New("decode error"))
 		t.mockMongo.EXPECT().FindOne(context.Background(), bson.M{
 			"owner_id": "user_id",
-		}).Return(t.singleResult, nil, nil)
+		}).Return(t.singleResult)
 		profile, err := t.service.GetProfile(context.Background(), "user_id")
 		t.Error(err)
 		t.Nil(profile)
@@ -75,7 +66,7 @@ func (t *ProfileTestSuite) TestGetProfile() {
 		}).Times(1)
 		t.mockMongo.EXPECT().FindOne(context.Background(), bson.M{
 			"owner_id": "user_id",
-		}).Return(t.singleResult, nil, nil)
+		}).Return(t.singleResult)
 		profile, err := t.service.GetProfile(context.Background(), "user_id")
 		t.NoError(err)
 		t.NotNil(profile)
