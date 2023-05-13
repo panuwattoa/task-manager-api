@@ -19,12 +19,12 @@ type IMongo interface {
 }
 
 type ProfileDoc struct {
-	OwnerID     string `json:"owner_id" bson:"owner_id"`
+	OwnerId     string `json:"owner_id" bson:"owner_id"`
 	DisplayName string `json:"display_name" bson:"display_name"`
 	Email       string `json:"email" bson:"email"`
 	DisplayPic  string `json:"display_pic" bson:"display_pic"`
-	UpdateDate  int64  `bson:"update_date"`
-	CreateDate  int64  `bson:"create_date"`
+	UpdateDate  int64  `json:"-" bson:"update_date"`
+	CreateDate  int64  `json:"-" bson:"create_date"`
 }
 
 type Profile struct {

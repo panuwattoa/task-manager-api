@@ -72,7 +72,7 @@ func (t *ProfileTestSuite) TestGetProfile() {
 	})
 	t.Run("get profile success", func() {
 		t.singleResult.EXPECT().Decode(&ProfileDoc{}).DoAndReturn(func(doc *ProfileDoc) error {
-			doc.OwnerID = "user_id"
+			doc.OwnerId = "user_id"
 			doc.DisplayName = "display_name"
 			doc.Email = "email"
 			doc.UpdateDate = 1569152551
@@ -86,7 +86,7 @@ func (t *ProfileTestSuite) TestGetProfile() {
 		profile, err := t.service.GetProfile(context.Background(), "user_id")
 		t.NoError(err)
 		t.NotNil(profile)
-		t.Equal("user_id", profile.OwnerID)
+		t.Equal("user_id", profile.OwnerId)
 		t.Equal("display_name", profile.DisplayName)
 		t.Equal("email", profile.Email)
 		t.Equal(int64(1569152551), profile.UpdateDate)
@@ -134,7 +134,7 @@ func (t *ProfileTestSuite) TestGetProgileList() {
 		var profiles = make([]ProfileDoc, 0)
 		t.cursor.EXPECT().All(context.Background(), &profiles).DoAndReturn(func(ctx context.Context, result interface{}) error {
 			profiles = append(profiles, ProfileDoc{
-				OwnerID:     "user_id",
+				OwnerId:     "user_id",
 				DisplayName: "display_name",
 				Email:       "email",
 				UpdateDate:  1569152551,
@@ -154,7 +154,7 @@ func (t *ProfileTestSuite) TestGetProgileList() {
 			"1", "2", "3", "user_id"})
 		t.NoError(err)
 		t.NotNil(profile)
-		t.Equal("user_id", profile[0].OwnerID)
+		t.Equal("user_id", profile[0].OwnerId)
 		t.Equal("display_name", profile[0].DisplayName)
 		t.Equal("email", profile[0].Email)
 		t.Equal(int64(1569152551), profile[0].UpdateDate)

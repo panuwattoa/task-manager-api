@@ -54,12 +54,7 @@ func (h *Handler) CreateTask(c *fiber.Ctx) error {
 		Topic       string `json:"topic"`
 		Description string `json:"description"`
 	}{}
-
-	ownerId := c.Params("ownerId")
 	if err := c.BodyParser(&payload); err != nil {
-		return err
-	}
-	if err := h.validateOwnerId(c, ownerId); err != nil {
 		return err
 	}
 	topic := strings.TrimSpace(payload.Topic)
@@ -70,6 +65,10 @@ func (h *Handler) CreateTask(c *fiber.Ctx) error {
 
 	if description == "" {
 		return fiber.NewError(fiber.StatusBadRequest, "Description is required")
+	}
+	ownerId := c.Params("ownerId")
+	if err := h.validateOwnerId(c, ownerId); err != nil {
+		return err
 	}
 
 	task, err := h.task.CreateTask(c.Context(), ownerId, topic, description)
@@ -203,13 +202,12 @@ func (h *Handler) CreateComment(c *fiber.Ctx) error {
 		return err
 	}
 
-	if err := h.validateOwnerId(c, ownerId); err != nil {
-		return err
-	}
-
 	content := strings.TrimSpace(payload.Content)
 	if content == "" {
 		return fiber.NewError(fiber.StatusBadRequest, "Content is required")
+	}
+	if err := h.validateOwnerId(c, ownerId); err != nil {
+		return err
 	}
 
 	comment, err := h.comment.CreateComment(c.Context(), ownerId, taskId, content)
