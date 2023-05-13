@@ -9,6 +9,7 @@ import (
 	reflect "reflect"
 	comment "task-manager-api/internal/comment"
 	profile "task-manager-api/internal/profile"
+	taskmanager "task-manager-api/internal/taskmanager"
 
 	gomock "github.com/golang/mock/gomock"
 )
@@ -36,18 +37,77 @@ func (m *MockITasks) EXPECT() *MockITasksMockRecorder {
 	return m.recorder
 }
 
-// CreateTask mocks base method.
-func (m *MockITasks) CreateTask(ctx context.Context, topic, desc string) error {
+// ArchiveTask mocks base method.
+func (m *MockITasks) ArchiveTask(ctx context.Context, ownerId, id string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateTask", ctx, topic, desc)
+	ret := m.ctrl.Call(m, "ArchiveTask", ctx, ownerId, id)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-// CreateTask indicates an expected call of CreateTask.
-func (mr *MockITasksMockRecorder) CreateTask(ctx, topic, desc interface{}) *gomock.Call {
+// ArchiveTask indicates an expected call of ArchiveTask.
+func (mr *MockITasksMockRecorder) ArchiveTask(ctx, ownerId, id interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateTask", reflect.TypeOf((*MockITasks)(nil).CreateTask), ctx, topic, desc)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ArchiveTask", reflect.TypeOf((*MockITasks)(nil).ArchiveTask), ctx, ownerId, id)
+}
+
+// CreateTask mocks base method.
+func (m *MockITasks) CreateTask(ctx context.Context, ownerId, topic, desc string) (*taskmanager.TaskDoc, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateTask", ctx, ownerId, topic, desc)
+	ret0, _ := ret[0].(*taskmanager.TaskDoc)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateTask indicates an expected call of CreateTask.
+func (mr *MockITasksMockRecorder) CreateTask(ctx, ownerId, topic, desc interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateTask", reflect.TypeOf((*MockITasks)(nil).CreateTask), ctx, ownerId, topic, desc)
+}
+
+// GetAllTask mocks base method.
+func (m *MockITasks) GetAllTask(ctx context.Context, page, limit int) ([]taskmanager.TaskDoc, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAllTask", ctx, page, limit)
+	ret0, _ := ret[0].([]taskmanager.TaskDoc)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetAllTask indicates an expected call of GetAllTask.
+func (mr *MockITasksMockRecorder) GetAllTask(ctx, page, limit interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAllTask", reflect.TypeOf((*MockITasks)(nil).GetAllTask), ctx, page, limit)
+}
+
+// GetTask mocks base method.
+func (m *MockITasks) GetTask(ctx context.Context, id string) (*taskmanager.TaskDoc, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetTask", ctx, id)
+	ret0, _ := ret[0].(*taskmanager.TaskDoc)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetTask indicates an expected call of GetTask.
+func (mr *MockITasksMockRecorder) GetTask(ctx, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTask", reflect.TypeOf((*MockITasks)(nil).GetTask), ctx, id)
+}
+
+// UpdateTaskStatus mocks base method.
+func (m *MockITasks) UpdateTaskStatus(ctx context.Context, ownerId, id string, status int) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateTaskStatus", ctx, ownerId, id, status)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateTaskStatus indicates an expected call of UpdateTaskStatus.
+func (mr *MockITasksMockRecorder) UpdateTaskStatus(ctx, ownerId, id, status interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateTaskStatus", reflect.TypeOf((*MockITasks)(nil).UpdateTaskStatus), ctx, ownerId, id, status)
 }
 
 // MockIComments is a mock of IComments interface.
@@ -74,32 +134,33 @@ func (m *MockIComments) EXPECT() *MockICommentsMockRecorder {
 }
 
 // CreateComment mocks base method.
-func (m *MockIComments) CreateComment(ctx context.Context, ownerID, topicID, content string) error {
+func (m *MockIComments) CreateComment(ctx context.Context, ownerId, topicId, content string) (*comment.CommentDoc, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateComment", ctx, ownerID, topicID, content)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// CreateComment indicates an expected call of CreateComment.
-func (mr *MockICommentsMockRecorder) CreateComment(ctx, ownerID, topicID, content interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateComment", reflect.TypeOf((*MockIComments)(nil).CreateComment), ctx, ownerID, topicID, content)
-}
-
-// GetComment mocks base method.
-func (m *MockIComments) GetComment(ctx context.Context, id string) (*comment.CommentDoc, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetComment", ctx, id)
+	ret := m.ctrl.Call(m, "CreateComment", ctx, ownerId, topicId, content)
 	ret0, _ := ret[0].(*comment.CommentDoc)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// GetComment indicates an expected call of GetComment.
-func (mr *MockICommentsMockRecorder) GetComment(ctx, id interface{}) *gomock.Call {
+// CreateComment indicates an expected call of CreateComment.
+func (mr *MockICommentsMockRecorder) CreateComment(ctx, ownerId, topicId, content interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetComment", reflect.TypeOf((*MockIComments)(nil).GetComment), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateComment", reflect.TypeOf((*MockIComments)(nil).CreateComment), ctx, ownerId, topicId, content)
+}
+
+// GetTopicComments mocks base method.
+func (m *MockIComments) GetTopicComments(ctx context.Context, topicId string, page, limit int) ([]comment.CommentDoc, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetTopicComments", ctx, topicId, page, limit)
+	ret0, _ := ret[0].([]comment.CommentDoc)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetTopicComments indicates an expected call of GetTopicComments.
+func (mr *MockICommentsMockRecorder) GetTopicComments(ctx, topicId, page, limit interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetTopicComments", reflect.TypeOf((*MockIComments)(nil).GetTopicComments), ctx, topicId, page, limit)
 }
 
 // MockIProfile is a mock of IProfile interface.
@@ -126,16 +187,16 @@ func (m *MockIProfile) EXPECT() *MockIProfileMockRecorder {
 }
 
 // GetProfile mocks base method.
-func (m *MockIProfile) GetProfile(ctx context.Context, id string) (*profile.ProfileDoc, error) {
+func (m *MockIProfile) GetProfile(ctx context.Context, ownerId string) (*profile.ProfileDoc, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetProfile", ctx, id)
+	ret := m.ctrl.Call(m, "GetProfile", ctx, ownerId)
 	ret0, _ := ret[0].(*profile.ProfileDoc)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetProfile indicates an expected call of GetProfile.
-func (mr *MockIProfileMockRecorder) GetProfile(ctx, id interface{}) *gomock.Call {
+func (mr *MockIProfileMockRecorder) GetProfile(ctx, ownerId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProfile", reflect.TypeOf((*MockIProfile)(nil).GetProfile), ctx, id)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetProfile", reflect.TypeOf((*MockIProfile)(nil).GetProfile), ctx, ownerId)
 }
