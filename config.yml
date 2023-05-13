@@ -6,8 +6,11 @@ server:
 mongoDB:
   collections:
     tasks: tasks
+    profiles: profiles
+    comments: comments
   timeout: 60 #second
   defaultContextTimeout: 60 #second
   appName: test
 pagination:
   maxLimit: 100
+  maxGetProfileLimit: 10

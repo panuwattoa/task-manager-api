@@ -8,8 +8,10 @@ import (
 	"os/signal"
 	"syscall"
 	"task-manager-api/config"
+	"task-manager-api/internal/comment"
 	"task-manager-api/internal/handler"
 	"task-manager-api/internal/mongo"
+	"task-manager-api/internal/profile"
 	"task-manager-api/internal/taskmanager"
 
 	"github.com/gofiber/fiber/v2"
@@ -28,15 +30,35 @@ func main() {
 	}
 
 	mongoTaskCollection := mongo.NewCollectionHelper(mongoDB.GetCollection(config.Conf.MongoDB.Collections.Tasks))
+	profileCollection := mongo.NewCollectionHelper(mongoDB.GetCollection(config.Conf.MongoDB.Collections.Profiles))
+	commentCollection := mongo.NewCollectionHelper(mongoDB.GetCollection(config.Conf.MongoDB.Collections.Comments))
+
 	taskService := taskmanager.NewTaskManager(mongoTaskCollection)
-	handler := handler.NewHandler(taskService)
+	pfService := profile.NewProfileService(profileCollection)
+	commentService := comment.NewCommentService(commentCollection)
+	handler := handler.NewHandler(taskService, commentService, pfService)
+
 	app := fiber.New(fiber.Config{
 		// Override default error handler
 		ErrorHandler: errorInterceptor,
 	})
 
-	app.Post("account/:ownerId/tasks", handler.CreateTask)
 	app.Get("/tasks", handler.GetAllTask)
+	app.Get("/tasks/:taskId", handler.GetTask)
+	app.Get("/profiles/:ownerId", handler.GetProfile)
+	app.Get("/profiles", handler.GetProfileList)
+	app.Get("/tasks/:taskId/comments", handler.GetTopicComments)
+
+	customerGroup := app.Group("/account")
+	customerGroup.Use(
+		func(c *fiber.Ctx) error {
+			return authInterceptor(c)
+		},
+	)
+	customerGroup.Post(":ownerId/tasks", handler.CreateTask)
+	customerGroup.Post(":ownerId/tasks/:taskId/comments", handler.CreateComment)
+	customerGroup.Patch(":ownerId/tasks/:taskId", handler.UpdateTask)
+	customerGroup.Delete(":ownerId/tasks/:taskId", handler.ArchiveTask)
 
 	go func() {
 		if err := app.Listen(":" + config.Conf.Server.Port); err != nil {
@@ -57,6 +79,12 @@ func main() {
 	}
 }
 
+func authInterceptor(ctx *fiber.Ctx) error {
+	// TODO: validate Authorization header
+
+	return ctx.Next()
+}
+
 func errorInterceptor(ctx *fiber.Ctx, err error) error {
 	// Override default error handler
 	// Status code defaults to 500
@@ -65,7 +93,7 @@ func errorInterceptor(ctx *fiber.Ctx, err error) error {
 	if e, ok := err.(*fiber.Error); ok {
 		code = e.Code
 	}
-
+	fmt.Printf("Error: %v\n", err)
 	msg := map[string]interface{}{
 		"status":    code,
 		"error_msg": err.Error(),
