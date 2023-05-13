@@ -3,7 +3,8 @@ package taskmanager
 import (
 	"context"
 	"errors"
-	mock_sigleResult "task-manager-api/internal/mongo/mock"
+	"reflect"
+	mock "task-manager-api/internal/mongo/mock"
 	mock_taskmanager "task-manager-api/internal/taskmanager/mock"
 	"testing"
 	"time"
@@ -13,6 +14,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type TaskManagerTestSuite struct {
@@ -20,14 +22,16 @@ type TaskManagerTestSuite struct {
 	ctrl         *gomock.Controller
 	mockMongo    *mock_taskmanager.MockIMongo
 	service      *TaskManager
-	singleResult *mock_sigleResult.MockSingleResult
+	singleResult *mock.MockSingleResult
+	cursor       *mock.MockCursor
 }
 
 func (t *TaskManagerTestSuite) SetupTest() {
 	t.ctrl = gomock.NewController(t.T())
 	t.mockMongo = mock_taskmanager.NewMockIMongo(t.ctrl)
 	t.service = NewTaskManager(t.mockMongo)
-	t.singleResult = mock_sigleResult.NewMockSingleResult(t.ctrl)
+	t.singleResult = mock.NewMockSingleResult(t.ctrl)
+	t.cursor = mock.NewMockCursor(t.ctrl)
 	t.service.time = func() time.Time {
 		loc, _ := time.LoadLocation("Asia/Bangkok")
 		return time.Date(2019, 9, 22, 12, 42, 31, 0, loc)
@@ -39,6 +43,7 @@ func (t *TaskManagerTestSuite) TearDownTest() {
 	t.mockMongo = nil
 	t.service = nil
 	t.singleResult = nil
+	t.cursor = nil
 }
 
 func TestTaskManagerTestSuite(t *testing.T) {
@@ -60,7 +65,7 @@ func (t *TaskManagerTestSuite) TestCreateTask() {
 		t.EqualError(err, "insert one error")
 	})
 
-	t.Run("create task success", func() {
+	t.Run("create task success but can not convert _id", func() {
 		t.mockMongo.EXPECT().InsertOne(context.Background(), TaskDoc{
 			Topic:       "topic",
 			Description: "description",
@@ -68,21 +73,34 @@ func (t *TaskManagerTestSuite) TestCreateTask() {
 			CreateDate:  t.service.now().Unix(),
 			OwnerID:     "owner_id",
 		}).Return(&mongo.InsertOneResult{
-			InsertedID: 100,
+			InsertedID: "5ad9a913478c26d220afb681",
 		}, nil)
 		taskDoc, err := t.service.CreateTask(context.Background(), "topic", "description", "owner_id")
+		t.NotNil(err)
+		t.EqualError(err, "cannot convert inserted id to object id")
+		t.Nil(taskDoc)
+	})
+
+	t.Run("create task success", func() {
+		objId, _ := primitive.ObjectIDFromHex("5ad9a913478c26d220afb681")
+		t.mockMongo.EXPECT().InsertOne(context.Background(), TaskDoc{
+			Topic:       "topic",
+			Description: "description",
+			Status:      1,
+			CreateDate:  t.service.now().Unix(),
+			OwnerID:     "owner_id",
+		}).Return(&mongo.InsertOneResult{
+			InsertedID: objId,
+		}, nil)
+		taskDoc, err := t.service.CreateTask(context.Background(), "topic", "description", "owner_id")
+		t.Nil(err)
 		t.NotNil(taskDoc)
-		t.ElementsMatch(
-			*taskDoc,
-			TaskDoc{
-				ID:          "100",
-				Topic:       "topic",
-				Description: "description",
-				Status:      1,
-				CreateDate:  t.service.now().Unix(),
-				OwnerID:     "owner_id",
-			},
-		)
+		t.Equal("5ad9a913478c26d220afb681", taskDoc.ID)
+		t.Equal("topic", taskDoc.Topic)
+		t.Equal("description", taskDoc.Description)
+		t.Equal(1, taskDoc.Status)
+		t.Equal(int64(1569130951), taskDoc.CreateDate)
+		t.Equal("owner_id", taskDoc.OwnerID)
 		t.NoError(err)
 	})
 }
@@ -92,9 +110,19 @@ func (t *TaskManagerTestSuite) TestGetTask() {
 		objectId, _ := primitive.ObjectIDFromHex("6041c3a6cfcba2fb9c4a4fd2")
 		t.mockMongo.EXPECT().FindOne(context.Background(), bson.M{
 			"_id": objectId,
+			"$or": []bson.M{
+				{
+					"archive_date": bson.M{
+						"$exists": false,
+					},
+				},
+				{
+					"archive_date": nil,
+				},
+			},
 		}).Return(t.singleResult)
-		t.singleResult.EXPECT().Decode(nil).Return(errors.New("something wrong")).Times(1)
-		taskDoc, err := t.service.GetTask(context.Background(), "id")
+		t.singleResult.EXPECT().Decode(&TaskDoc{}).Return(errors.New("something wrong")).Times(1)
+		taskDoc, err := t.service.GetTask(context.Background(), "6041c3a6cfcba2fb9c4a4fd2")
 		t.Error(err)
 		t.Nil(taskDoc)
 		t.EqualError(err, "something wrong")
@@ -115,8 +143,8 @@ func (t *TaskManagerTestSuite) TestGetTask() {
 				},
 			},
 		}).Return(t.singleResult)
-		t.singleResult.EXPECT().Decode(nil).Return(mongo.ErrNoDocuments).Times(1)
-		taskDoc, err := t.service.GetTask(context.Background(), "id")
+		t.singleResult.EXPECT().Decode(&TaskDoc{}).Return(mongo.ErrNoDocuments).Times(1)
+		taskDoc, err := t.service.GetTask(context.Background(), "6041c3a6cfcba2fb9c4a4fd2")
 		t.Error(err)
 		t.Nil(taskDoc)
 		t.EqualError(err, "mongo: no documents in result")
@@ -171,16 +199,11 @@ func (t *TaskManagerTestSuite) TestGetTask() {
 		taskDoc, err := t.service.GetTask(context.Background(), "6041c3a6cfcba2fb9c4a4fd2")
 		t.NotNil(taskDoc)
 		t.NoError(err)
-		t.ElementsMatch(
-			*taskDoc,
-			TaskDoc{
-				ID:          "6041c3a6cfcba2fb9c4a4fd2",
-				Topic:       "topic",
-				Description: "description",
-				Status:      1,
-				CreateDate:  1614962551,
-			},
-		)
+		t.Equal("6041c3a6cfcba2fb9c4a4fd2", taskDoc.ID)
+		t.Equal("topic", taskDoc.Topic)
+		t.Equal("description", taskDoc.Description)
+		t.Equal(1, taskDoc.Status)
+		t.Equal(int64(1614962551), taskDoc.CreateDate)
 	})
 }
 
@@ -191,8 +214,8 @@ func (t *TaskManagerTestSuite) TestArchiveTask() {
 			"_id": objectId,
 		}, bson.M{
 			"$set": bson.M{
-				"ArchiveDate": t.service.now().Unix(),
-				"UpdateDate":  t.service.now().Unix(),
+				"archive_date": t.service.now().Unix(),
+				"update_date":  t.service.now().Unix(),
 			},
 		}).Return(nil, errors.New("update one error"))
 		err := t.service.ArchiveTask(context.Background(), "6041c3a6cfcba2fb9c4a4fd2")
@@ -206,8 +229,8 @@ func (t *TaskManagerTestSuite) TestArchiveTask() {
 			"_id": objectId,
 		}, bson.M{
 			"$set": bson.M{
-				"ArchiveDate": t.service.now().Unix(),
-				"UpdateDate":  t.service.now().Unix(),
+				"archive_date": t.service.now().Unix(),
+				"update_date":  t.service.now().Unix(),
 			},
 		}).Return(&mongo.UpdateResult{
 			MatchedCount: 1,
@@ -224,8 +247,8 @@ func (t *TaskManagerTestSuite) TestUpdateTaskStatus() {
 			"_id": objectId,
 		}, bson.M{
 			"$set": bson.M{
-				"Status":     1,
-				"UpdateDate": t.service.now().Unix(),
+				"status":      1,
+				"update_date": t.service.now().Unix(),
 			},
 		}).Return(nil, errors.New("update one error"))
 		err := t.service.UpdateTaskStatus(context.Background(), "6041c3a6cfcba2fb9c4a4fd2", 1)
@@ -239,13 +262,100 @@ func (t *TaskManagerTestSuite) TestUpdateTaskStatus() {
 			"_id": objectId,
 		}, bson.M{
 			"$set": bson.M{
-				"Status":     2,
-				"UpdateDate": t.service.now().Unix(),
+				"status":      2,
+				"update_date": t.service.now().Unix(),
 			},
 		}).Return(&mongo.UpdateResult{
 			MatchedCount: 1,
 		}, nil)
 		err := t.service.UpdateTaskStatus(context.Background(), "6041c3a6cfcba2fb9c4a4fd2", 2)
 		t.NoError(err)
+	})
+}
+
+func (t *TaskManagerTestSuite) TestGetAllTask() {
+	l := int64(10)
+	skip := int64(1*10 - 10)
+	fOpt := &options.FindOptions{Limit: &l, Skip: &skip}
+
+	t.Run("get all task but find got error should return error", func() {
+		t.mockMongo.EXPECT().Find(context.Background(), bson.M{
+			"$or": []bson.M{
+				{
+					"archive_date": bson.M{
+						"$exists": false,
+					},
+				},
+				{
+					"archive_date": nil,
+				},
+			},
+		}, fOpt).Return(t.cursor, errors.New("find error"))
+		_, err := t.service.GetAllTask(context.Background(), 1, 10)
+		t.Error(err)
+		t.EqualError(err, "find error")
+	})
+
+	t.Run("get all task success but cursor decode error", func() {
+		t.mockMongo.EXPECT().Find(context.Background(), bson.M{
+			"$or": []bson.M{
+				{
+					"archive_date": bson.M{
+						"$exists": false,
+					},
+				},
+				{
+					"archive_date": nil,
+				},
+			},
+		}, fOpt).Return(t.cursor, nil)
+		taskDocs := make([]TaskDoc, 0)
+		t.cursor.EXPECT().All(context.Background(), &taskDocs).DoAndReturn(func(ctx context.Context, result interface{}) error {
+			return errors.New("cursor decode error")
+		}).Times(1)
+		tasks, err := t.service.GetAllTask(context.Background(), 1, 10)
+		t.NotNil(err)
+		t.EqualError(err, "cursor decode error")
+		t.Nil(tasks)
+	})
+
+	t.Run("get all task success", func() {
+		t.mockMongo.EXPECT().Find(context.Background(), bson.M{
+			"$or": []bson.M{
+				{
+					"archive_date": bson.M{
+						"$exists": false,
+					},
+				},
+				{
+					"archive_date": nil,
+				},
+			},
+		}, fOpt).Return(t.cursor, nil)
+		taskDocs := make([]TaskDoc, 0)
+		t.cursor.EXPECT().All(context.Background(), &taskDocs).DoAndReturn(func(ctx context.Context, result interface{}) error {
+			taskDocs = append(taskDocs, TaskDoc{
+				ID:          "6041c3a6cfcba2fb9c4a4fd2",
+				Topic:       "topic",
+				Description: "description",
+				Status:      1,
+				CreateDate:  1614962551,
+			})
+			taskDocs = append(taskDocs, TaskDoc{
+				ID:          "6041c3a6cfcba2fb9c4a4fd3",
+				Topic:       "topic2",
+				Description: "description2",
+				Status:      2,
+				CreateDate:  1614962552,
+			})
+			reflect.ValueOf(result).Elem().Set(reflect.ValueOf(taskDocs))
+			return nil
+		}).Times(1)
+		tasks, err := t.service.GetAllTask(context.Background(), 1, 10)
+		t.NoError(err)
+		t.NotNil(tasks)
+		t.Equal(2, len(tasks))
+		t.Equal("6041c3a6cfcba2fb9c4a4fd2", tasks[0].ID)
+		t.Equal("topic", tasks[0].Topic)
 	})
 }

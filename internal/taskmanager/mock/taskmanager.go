@@ -37,6 +37,26 @@ func (m *MockIMongo) EXPECT() *MockIMongoMockRecorder {
 	return m.recorder
 }
 
+// Find mocks base method.
+func (m *MockIMongo) Find(ctx context.Context, filter interface{}, opts ...*options.FindOptions) (mongo0.Cursor, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, filter}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "Find", varargs...)
+	ret0, _ := ret[0].(mongo0.Cursor)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Find indicates an expected call of Find.
+func (mr *MockIMongoMockRecorder) Find(ctx, filter interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, filter}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Find", reflect.TypeOf((*MockIMongo)(nil).Find), varargs...)
+}
+
 // FindOne mocks base method.
 func (m *MockIMongo) FindOne(ctx context.Context, filter interface{}, opts ...*options.FindOneOptions) mongo0.SingleResult {
 	m.ctrl.T.Helper()
