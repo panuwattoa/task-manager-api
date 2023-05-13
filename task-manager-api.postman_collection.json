@@ -1,0 +1,726 @@
+{
+	"info": {
+		"_postman_id": "6a3a2aee-2fe0-47f1-be9f-cdf4ccac18af",
+		"name": "task-manager-api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "13230697",
+		"_collection_link": "https://www.postman.com/dgtess/workspace/task-manager-api/collection/13230697-6a3a2aee-2fe0-47f1-be9f-cdf4ccac18af?action=share&creator=13230697&source=collection_link"
+	},
+	"item": [
+		{
+			"name": "GET All task",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/tasks?page=1&limit=10",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"tasks"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "limit",
+							"value": "10"
+						}
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "New Request",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/tasks?page=1&limit=10",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"tasks"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Sat, 13 May 2023 09:55:31 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "2174"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"data\": [\n        {\n            \"id\": \"645b9183fcfbc11433e23ab3\",\n            \"topic\": \"The Brightness of the Sun\",\n            \"description\": \"It can be said thatno one prefers a life in darkness to a life with a bright future\",\n            \"status\": 1,\n            \"create_date\": 1683721846,\n            \"owner_id\": \"1234\",\n            \"archive_date\": null,\n            \"update_date\": 1683721846\n        },\n        {\n            \"id\": \"645b91a756b7bf85c7bf0fcf\",\n            \"topic\": \"Vocabulary\",\n            \"description\": \"Lets start with the first tip. First practice new words by writing sentences.\",\n            \"status\": 1,\n            \"create_date\": 1683723368,\n            \"owner_id\": \"5678\",\n            \"archive_date\": null,\n            \"update_date\": 1683723368\n        },\n        {\n            \"id\": \"645b93d50c49d4df72dda2dc\",\n            \"topic\": \"First, practice new words by writing sentences.\",\n            \"description\": \"While reading English articles or books you can find some interesting new words there. And try to use it later when you speak or write.\",\n            \"status\": 1,\n            \"create_date\": 1683723394,\n            \"owner_id\": \"1234\",\n            \"archive_date\": null,\n            \"update_date\": 1683723394\n        },\n        {\n            \"id\": \"645b93db3d5f328160153dba\",\n            \"topic\": \"synonyms\",\n            \"description\": \"You can also find the synonyms to expand your vocabulary. Synonyms are the words that have similar or related meanings to other words.\",\n            \"status\": 1,\n            \"create_date\": 1683723413,\n            \"owner_id\": \"5678\",\n            \"archive_date\": null,\n            \"update_date\": 1683723413\n        },\n        {\n            \"id\": \"645b93e2deb13869ae24d96d\",\n            \"topic\": \"examples\",\n            \"description\": \"Here are examples of synonyms Beautiful and pretty are synonyms. Also, Happy and joyful are synonyms.\",\n            \"status\": 1,\n            \"create_date\": 1683723418,\n            \"owner_id\": \"1234\",\n            \"archive_date\": null,\n            \"update_date\": 1683723418\n        },\n        {\n            \"id\": \"645f3d149fa3f4e56a37fa3f\",\n            \"topic\": \"Hi I want to meet you\",\n            \"description\": \"jaa\",\n            \"status\": 1,\n            \"create_date\": 1683963156,\n            \"owner_id\": \"5555\",\n            \"archive_date\": null,\n            \"update_date\": null\n        },\n        {\n            \"id\": \"645f596add0dbee9d5a5d8ad\",\n            \"topic\": \"Hi I want to meet you 2\",\n            \"description\": \"jaa 2\",\n            \"status\": 1,\n            \"create_date\": 1683970410,\n            \"owner_id\": \"kkjkj\",\n            \"archive_date\": null,\n            \"update_date\": null\n        },\n        {\n            \"id\": \"645f5ac905cc868bb4efa6cc\",\n            \"topic\": \"Hi I want to meet you 2\",\n            \"description\": \"jaa 2\",\n            \"status\": 1,\n            \"create_date\": 1683970761,\n            \"owner_id\": \"kkjkj\",\n            \"archive_date\": null,\n            \"update_date\": null\n        },\n        {\n            \"id\": \"645f5bc46853198815be3f61\",\n            \"topic\": \"Hi I want to meet you 2\",\n            \"description\": \"jaa 2\",\n            \"status\": 1,\n            \"create_date\": 1683971012,\n            \"owner_id\": \"kkjkj\",\n            \"archive_date\": null,\n            \"update_date\": null\n        }\n    ]\n}"
+				}
+			]
+		},
+		{
+			"name": "GET task by id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/tasks/645b91a756b7bf85c7bf0fcf",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"tasks",
+						"645b91a756b7bf85c7bf0fcf"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "GET task by id",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/tasks/645b91a756b7bf85c7bf0fcf",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"tasks",
+								"645b91a756b7bf85c7bf0fcf"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Sat, 13 May 2023 10:06:07 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "256"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"data\": {\n        \"id\": \"645b91a756b7bf85c7bf0fcf\",\n        \"topic\": \"Vocabulary\",\n        \"description\": \"Lets start with the first tip. First practice new words by writing sentences.\",\n        \"status\": 1,\n        \"create_date\": 1683723368,\n        \"owner_id\": \"5678\",\n        \"archive_date\": null,\n        \"update_date\": 1683723368\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "GET Profile by ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/profiles/1234",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"profiles",
+						"1234"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "GET Profile by ID",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/profiles/1234",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"profiles",
+								"1234"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Sat, 13 May 2023 09:55:44 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "153"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"data\": {\n        \"owner_id\": \"1234\",\n        \"display_name\": \"Panuwat Jarujareet\",\n        \"email\": \"panuwat_jarujareet@hotmail.com\",\n        \"UpdateDate\": 1620000000,\n        \"CreateDate\": 1620000000\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "GET Profile List",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/profiles?owner_id=1234,134134,5678",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"profiles"
+					],
+					"query": [
+						{
+							"key": "owner_id",
+							"value": "1234,134134,5678"
+						}
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "GET Profile List",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/profiles?owner_id=1234,134134,5678",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"profiles"
+							],
+							"query": [
+								{
+									"key": "owner_id",
+									"value": "1234,134134,5678"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Sat, 13 May 2023 10:36:36 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "314"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"data\": [\n        {\n            \"owner_id\": \"1234\",\n            \"display_name\": \"Panuwat Jarujareet\",\n            \"email\": \"panuwat_jarujareet@hotmail.com\",\n            \"display_pic\": \"\",\n            \"UpdateDate\": 1620000000,\n            \"CreateDate\": 1620000000\n        },\n        {\n            \"owner_id\": \"5678\",\n            \"display_name\": \"Kondee Na\",\n            \"email\": \"kondee_na@gmail.com\",\n            \"display_pic\": \"\",\n            \"UpdateDate\": 1620000000,\n            \"CreateDate\": 1620000000\n        }\n    ]\n}"
+				}
+			]
+		},
+		{
+			"name": "Create task comment",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"content\" : \"sfvsfvsfvsfvsfv\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/account/5678/tasks/645b9183fcfbc11433e23ab3/comments",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"account",
+						"5678",
+						"tasks",
+						"645b9183fcfbc11433e23ab3",
+						"comments"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1",
+							"disabled": true
+						},
+						{
+							"key": "limit",
+							"value": "1",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Create task comment",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"content\" : \"sfvsfvsfvsfvsfv\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/account/5678/tasks/645b9183fcfbc11433e23ab3/comments",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"account",
+								"5678",
+								"tasks",
+								"645b9183fcfbc11433e23ab3",
+								"comments"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": "1",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"status": "Created",
+					"code": 201,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Sat, 13 May 2023 10:09:53 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "169"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"data\": {\n        \"id\": \"645f61f182963f98fb530443\",\n        \"owner_id\": \"5678\",\n        \"task_id\": \"645b9183fcfbc11433e23ab3\",\n        \"content\": \"sfvsfvsfvsfvsfv\",\n        \"create_date\": 1683972593,\n        \"update_date\": null\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "GET task comment",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/tasks/645b9183fcfbc11433e23ab3/comments?page=1&limit=10",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"tasks",
+						"645b9183fcfbc11433e23ab3",
+						"comments"
+					],
+					"query": [
+						{
+							"key": "page",
+							"value": "1"
+						},
+						{
+							"key": "limit",
+							"value": "10"
+						}
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "GET All task Copy",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/tasks/645b9183fcfbc11433e23ab3/comments",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"tasks",
+								"645b9183fcfbc11433e23ab3",
+								"comments"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Sat, 13 May 2023 09:29:04 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "350"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"data\": [\n        {\n            \"id\": \"645b9b2d2a1d5edff4cc63ca\",\n            \"owner_id\": \"1234\",\n            \"task_id\": \"645b9183fcfbc11433e23ab3\",\n            \"content\": \"I agree with you\",\n            \"create_date\": 1683722889,\n            \"update_date\": 1683722889\n        },\n        {\n            \"id\": \"645b9b2d2a1d5edff4cc63cb\",\n            \"owner_id\": \"5678\",\n            \"task_id\": \"645b9183fcfbc11433e23ab3\",\n            \"content\": \"I agree with you too\",\n            \"create_date\": 1683722889,\n            \"update_date\": 1683722889\n        }\n    ]\n}"
+				},
+				{
+					"name": "GET task comment",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/tasks/645b9183fcfbc11433e23ab3/comments?page=1&limit=1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"tasks",
+								"645b9183fcfbc11433e23ab3",
+								"comments"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Sat, 13 May 2023 09:56:43 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "178"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"data\": [\n        {\n            \"id\": \"645b9b2d2a1d5edff4cc63ca\",\n            \"owner_id\": \"1234\",\n            \"task_id\": \"645b9183fcfbc11433e23ab3\",\n            \"content\": \"I agree with you\",\n            \"create_date\": 1683722889,\n            \"update_date\": 1683722889\n        }\n    ]\n}"
+				}
+			]
+		},
+		{
+			"name": "Create Task",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"topic\":\"Hi I want to meet you 2\",\n    \"description\" : \"jaa 2\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/account/1234/tasks",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"account",
+						"1234",
+						"tasks"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Create Task",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"topic\":\"Hi I want to meet you 2\",\n    \"description\" : \"jaa 2\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/account/1234/tasks",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"account",
+								"1234",
+								"tasks"
+							]
+						}
+					},
+					"status": "Created",
+					"code": 201,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Sat, 13 May 2023 09:44:10 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "191"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"data\": {\n        \"id\": \"645f5beb8c5ed8c47ea012bb\",\n        \"topic\": \"Hi I want to meet you 2\",\n        \"description\": \"jaa 2\",\n        \"status\": 1,\n        \"create_date\": 1683971051,\n        \"owner_id\": \"1234\",\n        \"archive_date\": null,\n        \"update_date\": null\n    }\n}"
+				}
+			]
+		},
+		{
+			"name": "ArchiveTask",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/account/1234/tasks/645f5beb8c5ed8c47ea012bb/archive",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"account",
+						"1234",
+						"tasks",
+						"645f5beb8c5ed8c47ea012bb",
+						"archive"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "ArchiveTask",
+					"originalRequest": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:3000/account/1234/tasks/645f5beb8c5ed8c47ea012bb",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"account",
+								"1234",
+								"tasks",
+								"645f5beb8c5ed8c47ea012bb"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Sat, 13 May 2023 09:55:27 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "37"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"data\": \"Task archived successfully\"\n}"
+				}
+			]
+		},
+		{
+			"name": "Update Task",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"status\":3\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/account/1234/tasks/645b91a756b7bf85c7bf0fcf",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"account",
+						"1234",
+						"tasks",
+						"645b91a756b7bf85c7bf0fcf"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Update Task with Status",
+					"originalRequest": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\":3\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/account/1234/tasks/645b91a756b7bf85c7bf0fcf",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"account",
+								"1234",
+								"tasks",
+								"645b91a756b7bf85c7bf0fcf"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "Date",
+							"value": "Sat, 13 May 2023 09:58:27 GMT"
+						},
+						{
+							"key": "Content-Type",
+							"value": "application/json"
+						},
+						{
+							"key": "Content-Length",
+							"value": "43"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"data\": \"Task status updated successfully\"\n}"
+				}
+			]
+		}
+	]
+}
