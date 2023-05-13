@@ -58,7 +58,7 @@ func main() {
 	customerGroup.Post(":ownerId/tasks", handler.CreateTask)
 	customerGroup.Post(":ownerId/tasks/:taskId/comments", handler.CreateComment)
 	customerGroup.Patch(":ownerId/tasks/:taskId", handler.UpdateTask)
-	customerGroup.Delete(":ownerId/tasks/:taskId", handler.ArchiveTask)
+	customerGroup.Patch(":ownerId/tasks/:taskId/archive", handler.ArchiveTask)
 
 	go func() {
 		if err := app.Listen(":" + config.Conf.Server.Port); err != nil {
